@@ -31,7 +31,7 @@ def get_news_titles_and_links(url):
             # 过滤掉没有标题或者链接的条目，标题小于三个单词的也过滤掉
             if title and link:
                 words_in_title = len(title.split())  # 分割标题并计算单词数
-                if words_in_title >= 7:  # 如果标题有 xx或更多单词
+                if words_in_title >= 9:  # 如果标题有 xx或更多单词
                     news_items.append({'title': title, 'link': link})
 
         return news_items

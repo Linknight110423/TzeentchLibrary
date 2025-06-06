@@ -1,3 +1,4 @@
+#*- coding: utf-8 -*-
 import pandas as pd
 import ollama
 import re
@@ -5,9 +6,9 @@ def process_title_with_model(title):
     """
     使用ollama模型处理新闻标题
     """
-my_prompt = f"：：：{title}：：：这是使用爬虫爬取的网站内容其中有两类信息：：：第一种是无关信息（如广告、网站的组成部分等），不给这种信息打标签；；；第二种是真正的新闻内容，依据新闻标题打标签（标签内容需要概括总结标题，如：政治、科技、美国、特朗普、大模型、人工智能、芯片、贸易等），如果新闻标题涉及多个领域，请生成多个标签。"
-    # 调用本地模型进行生成
-    response = ollama.generate(model='deepseek-r1:7b', prompt=my_prompt)
+    my_prompt = f"：：：{title}：：：这是使用爬虫爬取的网站内容其中有两类信息：：：第一种是无关信息（如广告、网站的组成部分等），不给这种信息打标签；；；第二种是真正的新闻内容，依据新闻标题打标签（标签内容需要概括总结标题，如：政治、科技、美国、特朗普、大模型、人工智能、芯片、贸易等，至少包括三个维度：国家、领域（如科技、贸易、政治）、相关实体（如人物、机构等），每个维度里至少有一个标签），如果新闻标题涉及多个领域，请生成多个标签。标签请用<tags>#标签1#标签2#标签3</tags>这样的形式来呈现"
+    # 调用本地模型进行生0成
+    response = ollama.generate(model='deepseek-r1:14b', prompt=my_prompt)
 
     # 获取模型返回的响应内容
     actual_response = response['response']
@@ -31,8 +32,9 @@ def process_news_from_csv(input_csv, output_csv):
         # 使用模型处理标题
         model_response = process_title_with_model(news_title)
         # 提取model_response中的标签部分 <tags>#标签1#标签2#...</tags>
-        tags_match = re.search(r'<tags>(.*?)</tags>', model_response)
-        tags = tags_match.group(1) if tags_match else ""  # 如果匹配到标签则提取，否则返回空字符串
+        # 提取model_response中的标签部分，处理可能的嵌套和干扰文本
+        last_tags_match = re.search(r'<tags>(.*?)</tags>(?!.*<tags>)', model_response, re.DOTALL | re.IGNORECASE)
+        tags = last_tags_match.group(1) if last_tags_match else ""  # 提取最后一个tags标签中的内容  # 如果匹配到标签则提取，否则返回空字符串
         # 将新闻标题、模型响应和提取的标签添加到结果列表
         all_news.append({
             'title': news_title,
