@@ -8,7 +8,7 @@ def process_title_with_model(title):
     """
     my_prompt = f"：：：{title}：：：这是使用爬虫爬取的网站内容其中有两类信息：：：第一种是无关信息（如广告、网站的组成部分等），不给这种信息打标签；；；第二种是真正的新闻内容，依据新闻标题打标签（标签内容需要概括总结标题，如：政治、科技、美国、特朗普、大模型、人工智能、芯片、贸易等，至少包括三个维度：国家、领域（如科技、贸易、政治）、相关实体（如人物、机构等），每个维度里至少有一个标签），如果新闻标题涉及多个领域，请生成多个标签。标签请用<tags>#标签1#标签2#标签3</tags>这样的形式来呈现"
     # 调用本地模型进行生0成
-    response = ollama.generate(model='deepseek-r1:14b', prompt=my_prompt)
+    response = ollama.generate(model='deepseek-r1:8b', prompt=my_prompt)
 
     # 获取模型返回的响应内容
     actual_response = response['response']
